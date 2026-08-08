@@ -1,0 +1,50 @@
+======================================================================
+ODAVA Core - On-Device AI Vulnerability Analyzer
+System Architecture and Working Process Documentation
+======================================================================
+
+1. OVERVIEW
+ODAVA (On-Device AI Vulnerability Analyzer) is a desktop application built with Electron, React, and TypeScript. It is designed to perform fast, highly accurate, and completely offline static application security testing (SAST) on local codebases. It ensures that sensitive source code never leaves the developer's machine by utilizing a local AI engine.
+
+2. THE AI MODEL
+ODAVA leverages Small Language Models (SLMs) in GGUF format running on the CPU/GPU via the `node-llama-cpp` library. 
+- Current Model: Qwen2.5-0.5B-Instruct (Quantized to Q4_K_M for optimal speed/memory balance).
+- Format: GGUF
+- The AI runs entirely on-device, meaning no API keys or internet connection are required for inference.
+
+3. THE HYBRID SCANNING ENGINE
+To maximize performance and prevent the AI context window from being overwhelmed, ODAVA uses a two-phase hybrid scanning approach:
+
+Phase 1: High-Speed Static Rule Engine (Pre-Scan)
+- The scanner traverses the selected directory (skipping ignored folders like node_modules and .git).
+- It reads files and passes their contents to the `SecurityRuleEngine`.
+- The rule engine uses pre-defined heuristic patterns (Regex/AST-based) mapped to OWASP Top 10 and common CWE vulnerabilities.
+- Detected categories include:
+  * CWE-89 (SQL Injection)
+  * CWE-78/95 (Command Injection / RCE)
+  * CWE-798 (Hardcoded Secrets / Keys)
+  * CWE-79 (Cross-Site Scripting / XSS)
+  * CWE-22 (Path Traversal)
+  * CWE-327 (Weak Cryptography)
+  * CWE-1321 (Prototype Pollution)
+  * CWE-918 (Server-Side Request Forgery)
+
+Phase 2: Deep AI Enrichment
+- Once the static engine flags a vulnerable code snippet, ODAVA passes the isolated snippet to the local AI model.
+- The AI Service resets its session context (`setChatHistory([])`) before each prompt. This prevents context explosion, ensuring inference remains lightning fast (typically < 1-2 seconds per finding) and preventing the system from freezing.
+- The LLM analyzes the specific snippet and outputs structured JSON containing:
+  * A human-readable, context-aware description of the flaw.
+  * Specific, actionable remediation steps (e.g., "Use parameterized queries instead of string concatenation").
+
+4. THE WORKING PROCESS (END-TO-END)
+1. User Selects Codebase: The user selects a target directory via the Electron UI.
+2. Initialization: The main process ensures the AI model is loaded into memory (if available).
+3. Directory Traversal: The scanner recursively reads files matching supported extensions (.js, .ts, .py, .java, .go, .php, etc.).
+4. Detection: The rule engine instantly highlights problematic lines.
+5. Verification: The AI model enriches the findings.
+6. Real-Time Feedback: Progress events and enriched vulnerabilities are streamed instantly to the React frontend over IPC, populating the dashboard with severe alerts, code snippets, and fixes.
+
+5. ADVANTAGES
+- Privacy: 100% local analysis; zero data exfiltration.
+- Speed: Static rules process thousands of lines in milliseconds; AI only analyzes confirmed suspects.
+- Accuracy: AI reduces false positives and provides custom-tailored fix recommendations.
