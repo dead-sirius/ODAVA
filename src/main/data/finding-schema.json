@@ -1,0 +1,23 @@
+{
+  "type": "object",
+  "properties": {
+    "description": {
+      "type": "string",
+      "description": "1-2 plain-English sentences explaining what is wrong with this specific snippet."
+    },
+    "remediation": {
+      "type": "string",
+      "description": "A concrete, actionable fix — ideally naming the specific function/pattern to use instead."
+    },
+    "isFalsePositive": {
+      "type": "boolean",
+      "description": "true if the snippet, on closer reading, is NOT actually vulnerable (e.g. it already uses a parameterized query, escaping, or sanitizer the static rule couldn't see)."
+    },
+    "confidence": {
+      "type": "string",
+      "enum": ["low", "medium", "high"],
+      "description": "How confident the model is in this assessment, given it only sees this isolated snippet and not the whole file."
+    }
+  },
+  "required": ["description", "remediation", "isFalsePositive", "confidence"]
+}
