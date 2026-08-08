@@ -1,0 +1,106 @@
+{
+  "version": 1,
+  "model": "Qwen2.5-0.5B-Instruct (Q4_K_M)",
+  "basePromptTemplate": "You are a security code reviewer inside ODAVA, a static analysis tool. A rule-based scanner already flagged the snippet below as a possible {{CWE_ID}} ({{CWE_NAME}}) issue, with this rule message: \"{{RULE_MESSAGE}}\". Your only job is to look at this ONE isolated snippet and: (1) confirm or correct the rule's assessment, (2) explain the problem in plain English in 1-2 sentences, (3) give a concrete fix. You cannot see the rest of the file, so if the snippet already looks safe (e.g. it uses a parameterized query, an escaping function, or a sanitizer), set isFalsePositive to true and lower your confidence rather than inventing a problem. Respond with JSON only, matching the required schema.",
+  "perCwe": {
+    "CWE-89": {
+      "name": "SQL Injection",
+      "guidance": "Check specifically whether the query string uses a parameter placeholder (?, %s, $1, :name) with values passed separately, versus string concatenation or interpolation of the variable directly into the SQL text.",
+      "example": {
+        "snippet": "const q = \"SELECT * FROM orders WHERE id = \" + orderId;\ndb.query(q);",
+        "description": "The order ID is concatenated directly into the SQL string, so a crafted value could change the query's structure.",
+        "remediation": "Use a parameterized query: db.query('SELECT * FROM orders WHERE id = ?', [orderId]).",
+        "isFalsePositive": false,
+        "confidence": "high"
+      }
+    },
+    "CWE-78": {
+      "name": "OS Command Injection",
+      "guidance": "Check whether the command is built as an argument array (safe) or as a single interpolated/concatenated string passed to a shell (unsafe).",
+      "example": {
+        "snippet": "exec(\"ping \" + host, callback);",
+        "description": "The host value is concatenated into a shell command string, allowing shell metacharacters in host to alter the command.",
+        "remediation": "Use execFile('ping', ['-c', '1', host], callback) so the argument is never interpreted by a shell.",
+        "isFalsePositive": false,
+        "confidence": "high"
+      }
+    },
+    "CWE-95": {
+      "name": "Code Injection (eval)",
+      "guidance": "Check whether the argument to eval()/exec()/new Function() can contain data that ultimately originates from user input, versus being a fixed literal or trusted internal value.",
+      "example": {
+        "snippet": "eval(userExpression);",
+        "description": "eval() executes userExpression as code; if it can contain attacker-controlled text this is arbitrary code execution.",
+        "remediation": "Replace eval() with a restricted expression parser/evaluator, or avoid dynamic evaluation entirely.",
+        "isFalsePositive": false,
+        "confidence": "medium"
+      }
+    },
+    "CWE-798": {
+      "name": "Hardcoded Secret",
+      "guidance": "Check whether the literal is a real-looking credential (long, high-entropy string, known key prefix) versus a placeholder, example, or test fixture value like 'changeme' or 'xxx'.",
+      "example": {
+        "snippet": "const STRIPE_KEY = \"sk_live_51H8x...redacted...\";",
+        "description": "A live-looking Stripe secret key is hardcoded in source rather than loaded from configuration.",
+        "remediation": "Move the key to an environment variable or secret manager, and rotate this key since it may already be exposed in version control history.",
+        "isFalsePositive": false,
+        "confidence": "high"
+      }
+    },
+    "CWE-79": {
+      "name": "Cross-Site Scripting",
+      "guidance": "Check whether the HTML-sink is receiving raw user input, versus a value that appears to already be escaped/sanitized or is a fixed, non-user-controlled string.",
+      "example": {
+        "snippet": "el.innerHTML = comment.text;",
+        "description": "A user-supplied comment is inserted as raw HTML, so it could contain a script tag that executes in other users' browsers.",
+        "remediation": "Use el.textContent = comment.text for plain text, or sanitize with a library like DOMPurify if HTML formatting must be preserved.",
+        "isFalsePositive": false,
+        "confidence": "high"
+      }
+    },
+    "CWE-22": {
+      "name": "Path Traversal",
+      "guidance": "Check whether the code normalizes the path and verifies it stays within an intended base directory, versus joining request input directly into a filesystem path with no containment check.",
+      "example": {
+        "snippet": "const filePath = path.join(UPLOAD_DIR, req.query.filename);\nfs.readFile(filePath, cb);",
+        "description": "The filename comes directly from the request and is never checked against the upload directory, so a value like '../../etc/passwd' could read files outside it.",
+        "remediation": "Resolve the path with path.resolve and verify it starts with path.resolve(UPLOAD_DIR) before reading; reject the request otherwise.",
+        "isFalsePositive": false,
+        "confidence": "high"
+      }
+    },
+    "CWE-327": {
+      "name": "Weak Cryptography",
+      "guidance": "Check what the hash/cipher is actually used for. MD5/SHA-1 for password storage or security tokens is a real finding; MD5 used only for a non-security cache key or checksum is typically a false positive or low-severity finding.",
+      "example": {
+        "snippet": "const hash = crypto.createHash('md5').update(password).digest('hex');",
+        "description": "MD5 is used to hash a password directly, which is fast to brute-force and has no built-in salting.",
+        "remediation": "Use a password-hashing function such as bcrypt or argon2, which are slow by design and handle salting automatically.",
+        "isFalsePositive": false,
+        "confidence": "high"
+      }
+    },
+    "CWE-1321": {
+      "name": "Prototype Pollution",
+      "guidance": "Check whether the merge/assignment target key is fixed/trusted, versus derived from parsed request JSON where an attacker could supply '__proto__' or 'constructor' as a key.",
+      "example": {
+        "snippet": "function setDeep(obj, key, value) {\n  obj[key] = value;\n}\nsetDeep(config, req.body.key, req.body.value);",
+        "description": "req.body.key is used directly as a property name with no denylist, so a request with key='__proto__' can pollute Object.prototype for the whole process.",
+        "remediation": "Reject or ignore keys equal to '__proto__', 'constructor', or 'prototype' before performing the assignment.",
+        "isFalsePositive": false,
+        "confidence": "medium"
+      }
+    },
+    "CWE-918": {
+      "name": "Server-Side Request Forgery",
+      "guidance": "Check whether the destination URL/host is validated against an allowlist or checked against internal/link-local address ranges, versus being fetched directly from user input.",
+      "example": {
+        "snippet": "app.get('/preview', (req, res) => {\n  axios.get(req.query.url).then(r => res.send(r.data));\n});",
+        "description": "The application fetches whatever URL the client supplies with no restriction, which can be used to reach internal services or cloud metadata endpoints.",
+        "remediation": "Validate the URL's scheme and resolved host against an allowlist, and explicitly block private/link-local/metadata IP ranges before fetching.",
+        "isFalsePositive": false,
+        "confidence": "high"
+      }
+    }
+  }
+}

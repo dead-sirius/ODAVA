@@ -1,0 +1,760 @@
+{
+  "rules": [
+    {
+      "id": "js-sql-template-concat",
+      "cwe": "CWE-89",
+      "owasp": "A03:2021-Injection",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "severity": "critical",
+      "pattern": "\\.(query|execute)\\s*\\(\\s*`[^`]*\\$\\{",
+      "flags": "",
+      "name": "SQL query built from a template literal with interpolation",
+      "message": "Untrusted data appears to be interpolated directly into a SQL string passed to query()/execute(). Use a parameterized query instead."
+    },
+    {
+      "id": "js-sql-string-concat",
+      "cwe": "CWE-89",
+      "owasp": "A03:2021-Injection",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "severity": "critical",
+      "pattern": "\\.(query|execute)\\s*\\(\\s*[\"'][^\"']*[\"']\\s*\\+",
+      "flags": "",
+      "name": "SQL query built via string concatenation",
+      "message": "SQL string is concatenated with a variable before being executed. Use a parameterized query instead of string concatenation."
+    },
+    {
+      "id": "py-sql-fstring",
+      "cwe": "CWE-89",
+      "owasp": "A03:2021-Injection",
+      "languages": [
+        "python"
+      ],
+      "severity": "critical",
+      "pattern": "\\.execute\\s*\\(\\s*f[\"']",
+      "flags": "",
+      "name": "SQL query built from an f-string",
+      "message": "An f-string is passed directly to execute(). Use a parameterized query with placeholders instead."
+    },
+    {
+      "id": "py-sql-concat",
+      "cwe": "CWE-89",
+      "owasp": "A03:2021-Injection",
+      "languages": [
+        "python"
+      ],
+      "severity": "critical",
+      "pattern": "\\.execute\\s*\\(\\s*[\"'][^\"']*[\"']\\s*\\+",
+      "flags": "",
+      "name": "SQL query built via string concatenation",
+      "message": "SQL string is concatenated with a variable before being executed. Use a parameterized query instead."
+    },
+    {
+      "id": "py-sql-percent-format",
+      "cwe": "CWE-89",
+      "owasp": "A03:2021-Injection",
+      "languages": [
+        "python"
+      ],
+      "severity": "high",
+      "pattern": "\\.execute\\s*\\(\\s*[\"'][^\"']*%s[^\"']*[\"']\\s*%",
+      "flags": "",
+      "name": "SQL query built via %-formatting",
+      "message": "SQL string uses %-formatting instead of a parameterized query placeholder passed as a separate argument."
+    },
+    {
+      "id": "java-sql-concat",
+      "cwe": "CWE-89",
+      "owasp": "A03:2021-Injection",
+      "languages": [
+        "java"
+      ],
+      "severity": "critical",
+      "pattern": "execute(Query|Update)?\\s*\\(\\s*[\"'][^\"']*[\"']\\s*\\+",
+      "flags": "",
+      "name": "SQL query built via string concatenation",
+      "message": "Use PreparedStatement with bind parameters instead of concatenating a SQL string."
+    },
+    {
+      "id": "php-sql-concat",
+      "cwe": "CWE-89",
+      "owasp": "A03:2021-Injection",
+      "languages": [
+        "php"
+      ],
+      "severity": "critical",
+      "pattern": "(mysqli_query|->query)\\s*\\([^)]*\\.\\s*\\$",
+      "flags": "",
+      "name": "SQL query built via string concatenation",
+      "message": "Use a prepared statement with bind_param() instead of concatenating user input into the query string."
+    },
+    {
+      "id": "go-sql-concat",
+      "cwe": "CWE-89",
+      "owasp": "A03:2021-Injection",
+      "languages": [
+        "go"
+      ],
+      "severity": "critical",
+      "pattern": "\\.(Query|Exec)\\s*\\(\\s*[\"'][^\"']*[\"']\\s*\\+",
+      "flags": "",
+      "name": "SQL query built via string concatenation",
+      "message": "Use a parameterized query ($1, $2, ... or ?) instead of concatenating the SQL string."
+    },
+    {
+      "id": "js-cmd-exec-template",
+      "cwe": "CWE-78",
+      "owasp": "A03:2021-Injection",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "severity": "critical",
+      "pattern": "\\b(exec|execSync)\\s*\\(\\s*`[^`]*\\$\\{",
+      "flags": "",
+      "name": "Shell command built from a template literal with interpolation",
+      "message": "Untrusted data is interpolated into a shell command. Use execFile/execFileSync with an argument array instead of exec/execSync."
+    },
+    {
+      "id": "js-cmd-exec-concat",
+      "cwe": "CWE-78",
+      "owasp": "A03:2021-Injection",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "severity": "critical",
+      "pattern": "\\b(exec|execSync)\\s*\\(\\s*[\"'][^\"']*[\"']\\s*\\+",
+      "flags": "",
+      "name": "Shell command built via string concatenation",
+      "message": "Use execFile/execFileSync with an argument array instead of building a shell command string."
+    },
+    {
+      "id": "js-eval",
+      "cwe": "CWE-95",
+      "owasp": "A03:2021-Injection",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "severity": "high",
+      "pattern": "\\beval\\s*\\(",
+      "flags": "",
+      "name": "Use of eval()",
+      "message": "eval() executes its argument as code. If any part of the argument can be influenced by user input, this is arbitrary code execution."
+    },
+    {
+      "id": "js-new-function",
+      "cwe": "CWE-95",
+      "owasp": "A03:2021-Injection",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "severity": "high",
+      "pattern": "\\bnew\\s+Function\\s*\\(",
+      "flags": "",
+      "name": "Use of the Function constructor",
+      "message": "new Function(...) compiles and executes a string as code, equivalent in risk to eval() if input is untrusted."
+    },
+    {
+      "id": "py-os-system",
+      "cwe": "CWE-78",
+      "owasp": "A03:2021-Injection",
+      "languages": [
+        "python"
+      ],
+      "severity": "critical",
+      "pattern": "os\\.system\\s*\\(\\s*(f[\"']|[\"'][^\"']*[\"']\\s*\\+)",
+      "flags": "",
+      "name": "Shell command built via f-string or concatenation",
+      "message": "Pass a list of arguments to subprocess.run() with shell=False instead of building a shell command string."
+    },
+    {
+      "id": "py-subprocess-shell-true",
+      "cwe": "CWE-78",
+      "owasp": "A03:2021-Injection",
+      "languages": [
+        "python"
+      ],
+      "severity": "high",
+      "pattern": "subprocess\\.(run|call|Popen|check_output)\\([^)]*shell\\s*=\\s*True",
+      "flags": "",
+      "name": "subprocess call with shell=True",
+      "message": "shell=True invokes a shell to interpret the command string. Prefer shell=False with an argument list, especially if any part of the command is derived from input."
+    },
+    {
+      "id": "py-eval-exec",
+      "cwe": "CWE-95",
+      "owasp": "A03:2021-Injection",
+      "languages": [
+        "python"
+      ],
+      "severity": "high",
+      "pattern": "\\b(eval|exec)\\s*\\(",
+      "flags": "",
+      "name": "Use of eval()/exec()",
+      "message": "eval()/exec() execute their argument as code. If any part can be influenced by user input, this is arbitrary code execution."
+    },
+    {
+      "id": "php-shell-exec",
+      "cwe": "CWE-78",
+      "owasp": "A03:2021-Injection",
+      "languages": [
+        "php"
+      ],
+      "severity": "critical",
+      "pattern": "(shell_exec|system|passthru|popen)\\s*\\([^)]*\\.\\s*\\$",
+      "flags": "",
+      "name": "Shell command built via string concatenation",
+      "message": "Untrusted data is concatenated into a shell command. Use escapeshellarg() on every interpolated value, or avoid shelling out."
+    },
+    {
+      "id": "php-eval",
+      "cwe": "CWE-95",
+      "owasp": "A03:2021-Injection",
+      "languages": [
+        "php"
+      ],
+      "severity": "high",
+      "pattern": "\\beval\\s*\\(",
+      "flags": "",
+      "name": "Use of eval()",
+      "message": "eval() executes its argument as PHP code. If any part of the argument can be influenced by user input, this is arbitrary code execution."
+    },
+    {
+      "id": "java-runtime-exec",
+      "cwe": "CWE-78",
+      "owasp": "A03:2021-Injection",
+      "languages": [
+        "java"
+      ],
+      "severity": "critical",
+      "pattern": "Runtime\\.getRuntime\\(\\)\\.exec\\s*\\(\\s*[\"'][^\"']*[\"']\\s*\\+",
+      "flags": "",
+      "name": "Shell command built via string concatenation",
+      "message": "Use the ProcessBuilder overload that takes an argument array instead of a concatenated command string."
+    },
+    {
+      "id": "go-exec-shell",
+      "cwe": "CWE-78",
+      "owasp": "A03:2021-Injection",
+      "languages": [
+        "go"
+      ],
+      "severity": "critical",
+      "pattern": "exec\\.Command\\s*\\(\\s*[\"']sh[\"']\\s*,\\s*[\"']-c[\"']\\s*,\\s*[\"'][^\"']*[\"']\\s*\\+",
+      "flags": "",
+      "name": "Shell command built via string concatenation",
+      "message": "Pass the binary and its arguments directly to exec.Command instead of building a shell -c string."
+    },
+    {
+      "id": "generic-secret-assignment",
+      "cwe": "CWE-798",
+      "owasp": "A02:2021-Cryptographic Failures",
+      "languages": [
+        "javascript",
+        "typescript",
+        "python",
+        "java",
+        "go",
+        "php"
+      ],
+      "severity": "high",
+      "pattern": "(api[_-]?key|secret|password|passwd|access[_-]?key|auth[_-]?token)\\s*[:=]\\s*[\"'][A-Za-z0-9/+=_-]{8,}[\"']",
+      "flags": "i",
+      "name": "Hardcoded credential or key",
+      "message": "A credential-looking literal is assigned directly in source. Load it from an environment variable or secret manager instead."
+    },
+    {
+      "id": "aws-access-key",
+      "cwe": "CWE-798",
+      "owasp": "A02:2021-Cryptographic Failures",
+      "languages": [
+        "javascript",
+        "typescript",
+        "python",
+        "java",
+        "go",
+        "php"
+      ],
+      "severity": "critical",
+      "pattern": "AKIA[0-9A-Z]{16}",
+      "flags": "",
+      "name": "AWS access key ID in source",
+      "message": "This matches the format of an AWS access key ID. Rotate the key and load credentials from environment/secret manager instead."
+    },
+    {
+      "id": "private-key-block",
+      "cwe": "CWE-798",
+      "owasp": "A02:2021-Cryptographic Failures",
+      "languages": [
+        "javascript",
+        "typescript",
+        "python",
+        "java",
+        "go",
+        "php"
+      ],
+      "severity": "critical",
+      "pattern": "-----BEGIN (RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----",
+      "flags": "",
+      "name": "Private key embedded in source",
+      "message": "A PEM private key block is committed directly in source. Move it to a secrets store and rotate the key."
+    },
+    {
+      "id": "stripe-live-key",
+      "cwe": "CWE-798",
+      "owasp": "A02:2021-Cryptographic Failures",
+      "languages": [
+        "javascript",
+        "typescript",
+        "python",
+        "java",
+        "go",
+        "php"
+      ],
+      "severity": "critical",
+      "pattern": "sk_live_[0-9a-zA-Z]{16,}",
+      "flags": "",
+      "name": "Stripe live secret key in source",
+      "message": "This matches the format of a live Stripe secret key. Rotate it and load it from environment/secret manager instead."
+    },
+    {
+      "id": "slack-token",
+      "cwe": "CWE-798",
+      "owasp": "A02:2021-Cryptographic Failures",
+      "languages": [
+        "javascript",
+        "typescript",
+        "python",
+        "java",
+        "go",
+        "php"
+      ],
+      "severity": "high",
+      "pattern": "xox[baprs]-[0-9A-Za-z-]{10,}",
+      "flags": "",
+      "name": "Slack token in source",
+      "message": "This matches the format of a Slack API token. Rotate it and load it from environment/secret manager instead."
+    },
+    {
+      "id": "github-token",
+      "cwe": "CWE-798",
+      "owasp": "A02:2021-Cryptographic Failures",
+      "languages": [
+        "javascript",
+        "typescript",
+        "python",
+        "java",
+        "go",
+        "php"
+      ],
+      "severity": "high",
+      "pattern": "gh[pousr]_[A-Za-z0-9]{36,}",
+      "flags": "",
+      "name": "GitHub token in source",
+      "message": "This matches the format of a GitHub personal access / OAuth token. Rotate it and load it from environment/secret manager instead."
+    },
+    {
+      "id": "js-innerhtml",
+      "cwe": "CWE-79",
+      "owasp": "A03:2021-Injection",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "severity": "high",
+      "pattern": "\\.innerHTML\\s*=(?!=)",
+      "flags": "",
+      "name": "Assignment to innerHTML",
+      "message": "Assigning to innerHTML with unsanitized input allows script injection. Use textContent, or sanitize with a library like DOMPurify if HTML is required."
+    },
+    {
+      "id": "react-dangerously-set",
+      "cwe": "CWE-79",
+      "owasp": "A03:2021-Injection",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "severity": "high",
+      "pattern": "dangerouslySetInnerHTML",
+      "flags": "",
+      "name": "Use of dangerouslySetInnerHTML",
+      "message": "React's XSS protection is bypassed here. Ensure the HTML is sanitized (e.g., with DOMPurify) before rendering."
+    },
+    {
+      "id": "js-document-write",
+      "cwe": "CWE-79",
+      "owasp": "A03:2021-Injection",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "severity": "medium",
+      "pattern": "document\\.write\\s*\\(",
+      "flags": "",
+      "name": "Use of document.write()",
+      "message": "document.write() with unsanitized input can inject script content into the page."
+    },
+    {
+      "id": "vue-v-html",
+      "cwe": "CWE-79",
+      "owasp": "A03:2021-Injection",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "severity": "high",
+      "pattern": "v-html\\s*=",
+      "flags": "",
+      "name": "Use of Vue v-html directive",
+      "message": "v-html renders raw HTML without escaping. Ensure the bound value is sanitized before use."
+    },
+    {
+      "id": "py-jinja-safe-filter",
+      "cwe": "CWE-79",
+      "owasp": "A03:2021-Injection",
+      "languages": [
+        "python"
+      ],
+      "severity": "high",
+      "pattern": "\\|\\s*safe\\b",
+      "flags": "",
+      "name": "Jinja2 |safe filter disables autoescaping",
+      "message": "The |safe filter disables Jinja2's autoescaping for this value. Confirm the value cannot contain user-controlled HTML."
+    },
+    {
+      "id": "py-mark-safe",
+      "cwe": "CWE-79",
+      "owasp": "A03:2021-Injection",
+      "languages": [
+        "python"
+      ],
+      "severity": "high",
+      "pattern": "mark_safe\\s*\\(",
+      "flags": "",
+      "name": "Django mark_safe() disables escaping",
+      "message": "mark_safe() tells Django not to escape this value. Confirm it cannot contain user-controlled HTML."
+    },
+    {
+      "id": "py-render-template-string-fstring",
+      "cwe": "CWE-79",
+      "owasp": "A03:2021-Injection",
+      "languages": [
+        "python"
+      ],
+      "severity": "high",
+      "pattern": "render_template_string\\s*\\(\\s*f[\"']",
+      "flags": "",
+      "name": "Template built from an f-string",
+      "message": "Building the template itself from an f-string with user input can allow template/HTML injection. Pass user data as render variables instead."
+    },
+    {
+      "id": "php-echo-superglobal",
+      "cwe": "CWE-79",
+      "owasp": "A03:2021-Injection",
+      "languages": [
+        "php"
+      ],
+      "severity": "high",
+      "pattern": "echo\\s+[^;]*\\$_(GET|POST|REQUEST)\\b",
+      "flags": "",
+      "name": "Echoing a superglobal directly",
+      "message": "User input is echoed without escaping. Use htmlspecialchars() before output."
+    },
+    {
+      "id": "js-path-join-req",
+      "cwe": "CWE-22",
+      "owasp": "A01:2021-Broken Access Control",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "severity": "high",
+      "pattern": "path\\.join\\s*\\([^)]*req\\.(query|params|body)",
+      "flags": "",
+      "name": "File path built from request input",
+      "message": "A request-controlled value is joined into a file path. Normalize and verify the resolved path stays within the intended base directory."
+    },
+    {
+      "id": "js-fs-read-req",
+      "cwe": "CWE-22",
+      "owasp": "A01:2021-Broken Access Control",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "severity": "high",
+      "pattern": "fs\\.(readFile|readFileSync|createReadStream)\\s*\\([^)]*req\\.(query|params|body)",
+      "flags": "",
+      "name": "File read using request-controlled path",
+      "message": "A file is read using a path derived from request input without an apparent containment check."
+    },
+    {
+      "id": "py-open-request",
+      "cwe": "CWE-22",
+      "owasp": "A01:2021-Broken Access Control",
+      "languages": [
+        "python"
+      ],
+      "severity": "high",
+      "pattern": "open\\s*\\([^)]*request\\.(args|form|GET|POST|files)",
+      "flags": "",
+      "name": "File opened using request-controlled path",
+      "message": "A file is opened using a path derived from request input without an apparent containment check."
+    },
+    {
+      "id": "java-file-getparameter",
+      "cwe": "CWE-22",
+      "owasp": "A01:2021-Broken Access Control",
+      "languages": [
+        "java"
+      ],
+      "severity": "high",
+      "pattern": "new\\s+File\\s*\\([^)]*request\\.getParameter",
+      "flags": "",
+      "name": "File path built from request parameter",
+      "message": "A File is constructed from a request parameter without an apparent containment check against a base directory."
+    },
+    {
+      "id": "php-include-superglobal",
+      "cwe": "CWE-22",
+      "owasp": "A01:2021-Broken Access Control",
+      "languages": [
+        "php"
+      ],
+      "severity": "critical",
+      "pattern": "(fopen|file_get_contents|include|require|require_once|include_once)\\s*\\([^)]*\\$_(GET|POST|REQUEST)",
+      "flags": "",
+      "name": "File operation using a superglobal directly",
+      "message": "A file is opened/included using unvalidated request input. This can also lead to remote code execution via include/require."
+    },
+    {
+      "id": "go-os-open-request",
+      "cwe": "CWE-22",
+      "owasp": "A01:2021-Broken Access Control",
+      "languages": [
+        "go"
+      ],
+      "severity": "high",
+      "pattern": "os\\.Open\\s*\\([^)]*r\\.(URL\\.Query\\(\\)|FormValue)",
+      "flags": "",
+      "name": "File opened using request-controlled path",
+      "message": "A file is opened using a path derived from request input without an apparent containment check."
+    },
+    {
+      "id": "py-hashlib-md5-sha1",
+      "cwe": "CWE-327",
+      "owasp": "A02:2021-Cryptographic Failures",
+      "languages": [
+        "python"
+      ],
+      "severity": "medium",
+      "pattern": "hashlib\\.(md5|sha1)\\s*\\(",
+      "flags": "",
+      "name": "Use of MD5/SHA-1",
+      "message": "MD5 and SHA-1 are not suitable for password hashing or security-sensitive integrity checks. Use bcrypt/scrypt/Argon2 for passwords, SHA-256+ for integrity."
+    },
+    {
+      "id": "js-crypto-md5-sha1",
+      "cwe": "CWE-327",
+      "owasp": "A02:2021-Cryptographic Failures",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "severity": "medium",
+      "pattern": "createHash\\s*\\(\\s*[\"'](md5|sha1)[\"']",
+      "flags": "",
+      "name": "Use of MD5/SHA-1",
+      "message": "MD5 and SHA-1 are not suitable for password hashing or security-sensitive integrity checks. Use bcrypt/scrypt/Argon2 for passwords, SHA-256+ for integrity."
+    },
+    {
+      "id": "java-messagedigest-weak",
+      "cwe": "CWE-327",
+      "owasp": "A02:2021-Cryptographic Failures",
+      "languages": [
+        "java"
+      ],
+      "severity": "medium",
+      "pattern": "MessageDigest\\.getInstance\\s*\\(\\s*[\"'](MD5|SHA-?1)[\"']",
+      "flags": "i",
+      "name": "Use of MD5/SHA-1",
+      "message": "MD5 and SHA-1 are not suitable for password hashing or security-sensitive integrity checks. Use bcrypt/scrypt/Argon2 for passwords, SHA-256+ for integrity."
+    },
+    {
+      "id": "aes-ecb-mode",
+      "cwe": "CWE-327",
+      "owasp": "A02:2021-Cryptographic Failures",
+      "languages": [
+        "javascript",
+        "typescript",
+        "python",
+        "java",
+        "go",
+        "php"
+      ],
+      "severity": "high",
+      "pattern": "AES[/_]ECB|MODE_ECB",
+      "flags": "",
+      "name": "Use of AES in ECB mode",
+      "message": "ECB mode does not hide data patterns and is considered insecure. Use an authenticated mode such as GCM."
+    },
+    {
+      "id": "js-math-random-token",
+      "cwe": "CWE-330",
+      "owasp": "A02:2021-Cryptographic Failures",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "severity": "low",
+      "pattern": "Math\\.random\\s*\\(\\s*\\)",
+      "flags": "",
+      "name": "Math.random() (low confidence — review context)",
+      "message": "Math.random() is not cryptographically secure. Flag for review only if used to generate tokens, session IDs, or password-reset codes; use crypto.randomBytes()/randomUUID() for those."
+    },
+    {
+      "id": "php-weak-hash",
+      "cwe": "CWE-327",
+      "owasp": "A02:2021-Cryptographic Failures",
+      "languages": [
+        "php"
+      ],
+      "severity": "medium",
+      "pattern": "\\b(md5|sha1)\\s*\\(",
+      "flags": "",
+      "name": "Use of md5()/sha1()",
+      "message": "MD5 and SHA-1 are not suitable for password hashing. Use password_hash() with PASSWORD_BCRYPT/PASSWORD_ARGON2ID."
+    },
+    {
+      "id": "js-lodash-merge-req-body",
+      "cwe": "CWE-1321",
+      "owasp": "A03:2021-Injection",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "severity": "high",
+      "pattern": "_\\.(merge|defaultsDeep|assignIn|extend)\\s*\\([^)]*req\\.body",
+      "flags": "",
+      "name": "Deep merge of request body into an object",
+      "message": "Deep-merging request-controlled JSON into an object can allow __proto__/constructor.prototype pollution. Validate/allowlist keys or use a merge utility with prototype-pollution protection."
+    },
+    {
+      "id": "js-proto-bracket-assignment",
+      "cwe": "CWE-1321",
+      "owasp": "A03:2021-Injection",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "severity": "critical",
+      "pattern": "\\[\\s*[\"']__proto__[\"']\\s*\\]",
+      "flags": "",
+      "name": "Bracket access to __proto__",
+      "message": "Bracket-notation access to __proto__ (read or write), especially where the key can come from request data, is a prototype pollution primitive."
+    },
+    {
+      "id": "js-dot-proto-assignment",
+      "cwe": "CWE-1321",
+      "owasp": "A03:2021-Injection",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "severity": "critical",
+      "pattern": "\\.__proto__\\s*=",
+      "flags": "",
+      "name": "Direct __proto__ assignment",
+      "message": "Direct assignment to an object's __proto__ property can pollute the prototype chain for all instances."
+    },
+    {
+      "id": "js-axios-fetch-req",
+      "cwe": "CWE-918",
+      "owasp": "A10:2021-SSRF",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "severity": "high",
+      "pattern": "(axios|fetch)\\s*\\(\\s*req\\.(query|body|params)",
+      "flags": "",
+      "name": "Outbound request to a request-controlled URL",
+      "message": "The destination URL comes directly from request input. Validate scheme/host and block internal/link-local ranges before fetching."
+    },
+    {
+      "id": "js-http-get-req",
+      "cwe": "CWE-918",
+      "owasp": "A10:2021-SSRF",
+      "languages": [
+        "javascript",
+        "typescript"
+      ],
+      "severity": "high",
+      "pattern": "http\\.get\\s*\\(\\s*req\\.(query|body|params)",
+      "flags": "",
+      "name": "Outbound request to a request-controlled URL",
+      "message": "The destination URL comes directly from request input. Validate scheme/host and block internal/link-local ranges before fetching."
+    },
+    {
+      "id": "py-requests-req",
+      "cwe": "CWE-918",
+      "owasp": "A10:2021-SSRF",
+      "languages": [
+        "python"
+      ],
+      "severity": "high",
+      "pattern": "requests\\.(get|post|put|delete)\\s*\\(\\s*request\\.(args|form|json|values)",
+      "flags": "",
+      "name": "Outbound request to a request-controlled URL",
+      "message": "The destination URL comes directly from request input. Validate scheme/host and block internal/link-local ranges before fetching."
+    },
+    {
+      "id": "php-curl-superglobal",
+      "cwe": "CWE-918",
+      "owasp": "A10:2021-SSRF",
+      "languages": [
+        "php"
+      ],
+      "severity": "high",
+      "pattern": "curl_setopt\\s*\\([^)]*CURLOPT_URL[^)]*\\$_(GET|POST|REQUEST)",
+      "flags": "",
+      "name": "cURL target URL from a superglobal",
+      "message": "The cURL destination URL comes directly from request input. Validate scheme/host and block internal/link-local ranges before fetching."
+    },
+    {
+      "id": "php-file-get-contents-superglobal",
+      "cwe": "CWE-918",
+      "owasp": "A10:2021-SSRF",
+      "languages": [
+        "php"
+      ],
+      "severity": "high",
+      "pattern": "file_get_contents\\s*\\(\\s*\\$_(GET|POST|REQUEST)",
+      "flags": "",
+      "name": "file_get_contents() on a superglobal",
+      "message": "If this URL points at a remote resource, the destination comes directly from request input. Validate scheme/host before fetching."
+    },
+    {
+      "id": "go-http-get-req",
+      "cwe": "CWE-918",
+      "owasp": "A10:2021-SSRF",
+      "languages": [
+        "go"
+      ],
+      "severity": "high",
+      "pattern": "http\\.Get\\s*\\([^)]*r\\.(URL\\.Query\\(\\)|FormValue)",
+      "flags": "",
+      "name": "Outbound request to a request-controlled URL",
+      "message": "The destination URL comes directly from request input. Validate scheme/host and block internal/link-local ranges before fetching."
+    }
+  ]
+}
