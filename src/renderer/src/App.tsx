@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Shield, FolderSearch, Activity, Settings, Cpu, ShieldAlert, Download } from 'lucide-react';
+import { Shield, FolderSearch, Activity, Settings, Cpu, ShieldAlert, Download, Moon, Sun } from 'lucide-react';
 import { VulnerabilityReport, Vulnerability } from './components/VulnerabilityReport';
 import './assets/main.css';
 
@@ -11,6 +11,12 @@ function App() {
   const [modelReady, setModelReady] = useState(false);
   const [showSetup, setShowSetup] = useState(true);
   const [setupStatus, setSetupStatus] = useState<string>('Ready to download or connect model...');
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const [selectedModel, setSelectedModel] = useState<string>('phi-4-mini-instruct-q4.gguf');
+
+  useEffect(() => {
+    document.body.className = theme;
+  }, [theme]);
 
   useEffect(() => {
     let interval: any = null;
@@ -37,8 +43,7 @@ function App() {
 
   const handleSelectDirectory = async () => {
     if (!window.electron?.ipcRenderer) {
-      // Mock for browser dev
-      setSelectedPath('/mock/path/to/project');
+      alert('This feature is only available in the desktop app.');
       return;
     }
     const path = await window.electron.ipcRenderer.invoke('select-directory');
@@ -69,34 +74,27 @@ function App() {
       setIsScanning(false);
       window.electron.ipcRenderer.removeAllListeners('scan-progress');
     } else {
-      // Mock scan
-      setTimeout(() => setScanProgress(40), 1000);
-      setTimeout(() => setScanProgress(80), 2000);
-      setTimeout(() => {
-        setScanProgress(100);
-        setVulnerabilities([
-          {
-            id: '1',
-            title: 'SQL Injection Risk',
-            severity: 'high',
-            file: 'src/api/users.ts:45',
-            description: 'Direct concatenation of user input into SQL query string.',
-            snippet: "const query = `SELECT * FROM users WHERE username = '${req.body.username}'`;",
-            recommendation: 'Use parameterized queries or an ORM to prevent SQL injection.'
-          }
-        ]);
-        setIsScanning(false);
-      }, 3000);
+      alert('This feature is only available in the desktop app.');
+      setIsScanning(false);
+      setScanProgress(0);
     }
   };
 
   const handleSetupModel = async () => {
-    setSetupStatus('Downloading Phi-4 Mini (Mocking...)');
-    setTimeout(() => {
-      setSetupStatus('Model Ready!');
-      setModelReady(true);
-      setTimeout(() => setShowSetup(false), 1000);
-    }, 2000);
+    setSetupStatus(`Setting up ${selectedModel}...`);
+    if (window.electron?.ipcRenderer) {
+      const result = await window.electron.ipcRenderer.invoke('setup-model', selectedModel);
+      if (result.success) {
+        setSetupStatus('Model Ready!');
+        setModelReady(true);
+        setTimeout(() => setShowSetup(false), 1000);
+      } else {
+        setSetupStatus(`Error: ${result.error}`);
+      }
+    } else {
+      alert('This feature is only available in the desktop app.');
+      setShowSetup(false);
+    }
   };
 
   const handleExportPdf = async () => {
@@ -118,9 +116,20 @@ function App() {
             <Cpu size={48} color="var(--accent-color)" />
             <h2>Local AI Model Setup</h2>
             <p style={{ color: 'var(--text-secondary)' }}>
-              ODAVA requires a local Small Language Model (SLM) like Phi-4 Mini to analyze your code without sending it to the cloud.
+              ODAVA requires a local Small Language Model (SLM) to analyze your code without sending it to the cloud.
             </p>
-            <div style={{ background: 'rgba(0,0,0,0.4)', padding: '12px', borderRadius: '8px', width: '100%', fontSize: '0.9rem' }}>
+            <div style={{ background: 'var(--bg-panel)', padding: '16px', borderRadius: '8px', width: '100%', fontSize: '0.95rem', textAlign: 'left', border: '1px solid var(--border-color)' }}>
+              <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-primary)', fontWeight: 500 }}>Select AI Model:</label>
+              <select 
+                value={selectedModel} 
+                onChange={(e) => setSelectedModel(e.target.value)}
+                style={{ width: '100%', padding: '10px', borderRadius: '6px', background: 'var(--bg-secondary)', color: 'var(--text-primary)', border: '1px solid var(--border-color)', outline: 'none' }}
+              >
+                <option value="phi-4-mini-instruct-q4.gguf">Phi-4 Mini (Recommended - Fast & Accurate)</option>
+                <option value="gemma-3-nano.gguf">Gemma 3 Nano (Lightweight)</option>
+              </select>
+            </div>
+            <div style={{ background: 'rgba(0,0,0,0.2)', padding: '12px', borderRadius: '8px', width: '100%', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
               {setupStatus}
             </div>
             <div style={{ display: 'flex', gap: '1rem', width: '100%', marginTop: '1rem' }}>
@@ -145,7 +154,10 @@ function App() {
             </div>
           </div>
           <div>
-            <button className="btn-outline" onClick={() => setShowSetup(true)} style={{ padding: '8px', borderRadius: '50%' }}>
+            <button className="btn-outline" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} style={{ padding: '10px', borderRadius: '50%', marginRight: '12px' }}>
+              {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
+            <button className="btn-outline" onClick={() => setShowSetup(true)} style={{ padding: '10px', borderRadius: '50%' }}>
               <Settings size={20} />
             </button>
           </div>

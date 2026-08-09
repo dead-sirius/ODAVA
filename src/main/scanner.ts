@@ -20,11 +20,16 @@ export class Scanner {
 
   constructor() {
     this.aiService = new AiService();
+    // Default model
+    this.setupModel('phi-4-mini-instruct-q4.gguf').catch(console.error);
+  }
+
+  public async setupModel(modelName: string): Promise<void> {
     const modelPath = app.isPackaged 
-      ? path.join(process.resourcesPath, 'models', 'qwen2.5-0.5b-instruct-q4_k_m.gguf')
-      : path.join(process.cwd(), 'models', 'qwen2.5-0.5b-instruct-q4_k_m.gguf');
+      ? path.join(process.resourcesPath, 'models', modelName)
+      : path.join(process.cwd(), 'models', modelName);
     
-    this.aiService.init(modelPath).catch(console.error);
+    await this.aiService.init(modelPath);
   }
 
   public isModelReady(): boolean {
@@ -65,22 +70,21 @@ export class Scanner {
               confidence = aiEnriched.confidence;
             }
 
-            if (!isFalsePositive) {
-              const vulnObj = {
-                id: Math.random().toString(36).substring(2, 11),
-                file: relativePath,
-                title: enriched.title,
-                severity: enriched.severity,
-                description: enriched.description,
-                snippet: enriched.snippet,
-                recommendation: enriched.recommendation,
-                cwe: enriched.cwe,
-                confidence: confidence
-              };
+            const vulnObj = {
+              id: Math.random().toString(36).substring(2, 11),
+              file: relativePath,
+              title: enriched.title,
+              severity: enriched.severity,
+              description: enriched.description,
+              snippet: enriched.snippet,
+              recommendation: enriched.recommendation,
+              cwe: enriched.cwe,
+              confidence: confidence,
+              isFalsePositive: isFalsePositive
+            };
 
-              vulnerabilities.push(vulnObj);
-              onProgress(Math.floor(((i + 1) / totalFiles) * 100), vulnObj);
-            }
+            vulnerabilities.push(vulnObj);
+            onProgress(Math.floor(((i + 1) / totalFiles) * 100), vulnObj);
           }
         }
         

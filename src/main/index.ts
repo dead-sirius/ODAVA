@@ -81,6 +81,14 @@ ipcMain.handle('check-model-status', async () => {
   return { ready: scanner ? scanner.isModelReady() : false };
 });
 
+ipcMain.handle('setup-model', async (_, modelName: string) => {
+  if (scanner) {
+    await scanner.setupModel(modelName);
+    return { success: true };
+  }
+  return { success: false, error: 'Scanner not initialized' };
+});
+
 ipcMain.handle('start-scan', async (event, dirPath) => {
   if (!scanner) return [];
   
